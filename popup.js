@@ -1,30 +1,39 @@
 document.addEventListener("DOMContentLoaded", function () {
   const noteContent = document.getElementById("noteContent");
   const saveButton = document.getElementById("saveButton");
-  const displayNoteButton = document.getElementById("displayNoteButton"); // Nouveau bouton pour afficher les notes
+  const displayNoteButton = document.getElementById("displayNoteButton");
 
-  // Charger et afficher la note lors du clic sur le bouton
   displayNoteButton.addEventListener("click", function () {
-    // Récupérer la note du stockage local
-    chrome.storage.local.get("userNote", function (result) {
-      if (result.userNote) {
-        noteContent.value = result.userNote; // Afficher la note dans le champ de texte
-      } else {
-        noteContent.value = "Aucune note enregistrée."; // Si aucune note n'est trouvée
-      }
+    chrome.storage.local.get({ userNotes: [] }, function (result) {
+      const notes = result.userNotes;
+
+      const noteList = document.getElementById("noteList");
+      noteList.innerHTML = "";
+
+      notes.forEach(function (note, index) {
+        const noteElement = document.createElement("div");
+        noteElement.classList.add("list_item");
+        noteElement.textContent = note;
+        noteElement.addEventListener("click", function () {
+          console.log(note);
+          noteContent.value = note;
+        });
+        noteList.appendChild(noteElement);
+      });
     });
   });
 
-  // Enregistrer la note
   saveButton.addEventListener("click", function () {
     const noteText = noteContent.value;
 
-    // Vous pouvez ajouter ici la logique pour sauvegarder la note
-    // Par exemple, vous pouvez stocker la note dans le stockage local de l'extension
+    chrome.storage.local.get({ userNotes: [] }, function (result) {
+      const notes = result.userNotes;
+      notes.push(noteText);
+      noteContent.value = "";
 
-    // Exemple de stockage local
-    chrome.storage.local.set({ userNote: noteText }, function () {
-      console.log("Note enregistrée : " + noteText);
+      chrome.storage.local.set({ userNotes: notes }, function () {
+        console.log("Nouvelle note enregistrée : " + noteText);
+      });
     });
   });
 });

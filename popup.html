@@ -4,14 +4,56 @@
 <head>
     <title>Bloc-notes Rapide</title>
     <style>
-        /* Votre CSS pour l'interface utilisateur ici */
+        body {
+            width: 350px;
+            height: 200px;
+            background-color: #314059;
+            padding: 5px;
+        }
+
+        h1 {
+            margin: 10px auto;
+            width: fit-content;
+        }
+
+        textarea {
+            border-radius: 2%;
+            padding: 10px;
+        }
+
+        button {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        #saveButton {
+            background-color: green;
+        }
+
+        #noteList {
+            margin-top: 10px;
+        }
+
+        .list_item {
+            padding: 5px;
+            cursor: pointer;
+            border-bottom: 1px solid;
+        }
+
+        .list_item:hover {
+            background-color: #29364b;
+        }
     </style>
 </head>
 
 <body>
-    <textarea id="noteContent" rows="10" cols="30"></textarea>
+
+    <h1>QuickNote</h1>
+    <textarea id="noteContent" rows="10" cols="40"></textarea>
+    <button id="displayNoteButton">Afficher les notes enregistrees</button>
     <button id="saveButton">Enregistrer</button>
-    <button id="displayNoteButton">Afficher la note enregistrée</button> <!-- Bouton pour afficher la note -->
+
+    <div id="noteList"></div>
 
     <script src="popup.js"></script>
 </body>
