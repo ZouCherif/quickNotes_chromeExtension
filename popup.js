@@ -2,6 +2,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const noteContent = document.getElementById("noteContent");
   const saveButton = document.getElementById("saveButton");
   const displayNoteButton = document.getElementById("displayNoteButton");
+  const deleteNoteButton = document.getElementById("deleteNote");
+  const modifyNoteButton = document.getElementById("modifyNote");
+  const returnButton = document.getElementById("returnButton");
+  const noteList = document.getElementById("noteList");
+  // chrome.storage.local.remove("userNotes", function () {
+  //   console.log("Toutes les notes ont été supprimées du stockage local.");
+  // });
+  var currentNote = -1;
 
   displayNoteButton.addEventListener("click", function () {
     chrome.storage.local.get({ userNotes: [] }, function (result) {
@@ -13,27 +21,87 @@ document.addEventListener("DOMContentLoaded", function () {
       notes.forEach(function (note, index) {
         const noteElement = document.createElement("div");
         noteElement.classList.add("list_item");
-        noteElement.textContent = note;
+        noteElement.textContent = note.content;
         noteElement.addEventListener("click", function () {
-          console.log(note);
-          noteContent.value = note;
+          noteContent.value = note.content;
+          currentNote = index;
+          deleteNoteButton.style.display = "block";
+          modifyNoteButton.style.display = "block";
+          returnButton.style.display = "block";
+          saveButton.style.display = "none";
+          displayNoteButton.style.display = "none";
+          noteList.style.display = "none";
         });
         noteList.appendChild(noteElement);
       });
     });
   });
 
-  saveButton.addEventListener("click", function () {
-    const noteText = noteContent.value;
+  returnButton.addEventListener("click", function () {
+    noteContent.value = "";
+    currentNote = -1;
+    deleteNoteButton.style.display = "none";
+    modifyNoteButton.style.display = "none";
+    saveButton.style.display = "block";
+    displayNoteButton.style.display = "block";
+    noteList.style.display = "block";
+    returnButton.style.display = "none";
+  });
 
-    chrome.storage.local.get({ userNotes: [] }, function (result) {
-      const notes = result.userNotes;
-      notes.push(noteText);
-      noteContent.value = "";
+  modifyNoteButton.addEventListener("click", function () {
+    if (currentNote !== -1) {
+      const noteText = noteContent.value;
 
-      chrome.storage.local.set({ userNotes: notes }, function () {
-        console.log("Nouvelle note enregistrée : " + noteText);
+      chrome.storage.local.get({ userNotes: [] }, function (result) {
+        const notes = result.userNotes;
+
+        notes[currentNote].content = noteText;
+
+        chrome.storage.local.set({ userNotes: notes }, function () {
+          console.log("Note modifiée : " + noteText);
+          returnButton.click();
+          displayNoteButton.click();
+        });
       });
-    });
+    }
+  });
+
+  deleteNoteButton.addEventListener("click", function () {
+    if (currentNote !== -1) {
+      chrome.storage.local.get({ userNotes: [] }, function (result) {
+        const notes = result.userNotes;
+
+        notes.splice(currentNote, 1); // Supprimer la note sélectionnée du tableau
+
+        chrome.storage.local.set({ userNotes: notes }, function () {
+          console.log("Note supprimée");
+          returnButton.click();
+          displayNoteButton.click(); // Revenir à la liste des notes après suppression
+        });
+      });
+    }
+  });
+
+  saveButton.addEventListener("click", function () {
+    if (noteContent.value != "") {
+      const noteText = noteContent.value;
+
+      chrome.storage.local.get({ userNotes: [] }, function (result) {
+        const notes = result.userNotes;
+        const newIndex = notes.length; // Indice pour la nouvelle note
+
+        const newNote = {
+          index: newIndex,
+          content: noteText,
+        };
+
+        notes.push(newNote);
+        noteContent.value = "";
+
+        chrome.storage.local.set({ userNotes: notes }, function () {
+          console.log("Nouvelle note enregistrée : " + noteText);
+        });
+      });
+    }
   });
 });
