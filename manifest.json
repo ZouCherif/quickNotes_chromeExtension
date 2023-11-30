@@ -3,7 +3,7 @@
   "name": "Bloc-notes Rapide",
   "version": "1.0",
   "description": "Une extension de bloc-notes rapide pour Chrome.",
-  "permissions": ["activeTab", "storage"],
+  "permissions": ["activeTab", "storage", "notifications"],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
