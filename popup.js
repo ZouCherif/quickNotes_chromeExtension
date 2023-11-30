@@ -190,6 +190,8 @@ document.addEventListener("DOMContentLoaded", function () {
     chrome.notifications.create(options, function (notificationId) {
       // Callback appelée après la création de la notification
       console.log("Notification affichée avec l'ID : " + notificationId);
+      const audioElement = document.getElementById("notificationSound");
+      audioElement.play();
     });
   }
 
