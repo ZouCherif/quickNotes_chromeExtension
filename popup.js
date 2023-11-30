@@ -21,7 +21,23 @@ document.addEventListener("DOMContentLoaded", function () {
       notes.forEach(function (note, index) {
         const noteElement = document.createElement("div");
         noteElement.classList.add("list_item");
-        noteElement.textContent = note.content;
+
+        const noteContentDiv = document.createElement("div");
+        noteContentDiv.classList.add("note_content");
+        noteContentDiv.textContent = note.content; // Contenu de la note
+
+        const timestampDiv = document.createElement("div");
+        timestampDiv.classList.add("timestamp");
+
+        const timestamp = new Date(note.timestamp);
+        const hours = timestamp.getHours().toString().padStart(2, "0");
+        const minutes = timestamp.getMinutes().toString().padStart(2, "0");
+        const formattedTime = `${hours}:${minutes}`;
+        timestampDiv.textContent = formattedTime; // Temps de la note
+
+        noteElement.appendChild(noteContentDiv);
+        noteElement.appendChild(timestampDiv);
+
         noteElement.addEventListener("click", function () {
           noteContent.value = note.content;
           currentNote = index;
@@ -56,6 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const notes = result.userNotes;
 
         notes[currentNote].content = noteText;
+        notes[currentNote].timestamp = new Date().getTime();
 
         chrome.storage.local.set({ userNotes: notes }, function () {
           console.log("Note modifiée : " + noteText);
@@ -85,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
   saveButton.addEventListener("click", function () {
     if (noteContent.value != "") {
       const noteText = noteContent.value;
-
+      const currentTime = new Date();
       chrome.storage.local.get({ userNotes: [] }, function (result) {
         const notes = result.userNotes;
         const newIndex = notes.length; // Indice pour la nouvelle note
@@ -93,6 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const newNote = {
           index: newIndex,
           content: noteText,
+          timestamp: currentTime.getTime(),
         };
 
         notes.push(newNote);
